@@ -11,6 +11,13 @@ struct PracticeTimerView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            Image("StringSenseLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 72, height: 72)
+                .clipShape(Circle())
+                .padding(.top, 16)
+
             Spacer()
 
             progressRing

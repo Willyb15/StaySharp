@@ -152,12 +152,11 @@ struct TunerView: View {
 
                 VStack {
                     Spacer()
-                    HStack(spacing: -5) {
-                        Text("S").scaleEffect(x: -1, y: 1)
-                        Text("S")
-                    }
-                    .font(.system(size: 42, weight: .bold, design: .serif))
-                    .foregroundStyle(Color.white.opacity(0.72))
+                    Image("StringSenseLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 72, height: 72)
+                        .clipShape(Circle())
                     Spacer()
                 }
                 .frame(width: 80, height: 148)

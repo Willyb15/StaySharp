@@ -7,6 +7,7 @@ class MetronomeViewModel: ObservableObject {
     @Published var bpm: Double = 120
     @Published var isPlaying = false
     @Published var currentBeat = 0
+    @Published var activeBeat = 0  // which bar is visually lit — set before increment
     @Published var beatsPerMeasure = 4
     @Published var beatFlash = false
 
@@ -67,6 +68,8 @@ class MetronomeViewModel: ObservableObject {
 
     private func tick() {
         let beat = currentBeat % beatsPerMeasure
+        activeBeat = beat  // set visual BEFORE incrementing so bar matches audio
+
         if beat == 0 {
             audio.playAccent()
         } else {

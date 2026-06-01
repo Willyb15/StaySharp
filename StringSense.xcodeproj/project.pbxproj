@@ -24,6 +24,7 @@
 		AA0EC11111111111111111AA /* TunerMeterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0FC11111111111111111AA /* TunerMeterView.swift */; };
 		AA0ED11111111111111111AA /* TunerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0FD11111111111111111AA /* TunerView.swift */; };
 		AA0EE11111111111111111AA /* TuningPresetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0FE11111111111111111AA /* TuningPresetsView.swift */; };
+		AABB000000000000000000AA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AABB111111111111111111AA /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		AA0FC11111111111111111AA /* TunerMeterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunerMeterView.swift; sourceTree = "<group>"; };
 		AA0FD11111111111111111AA /* TunerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunerView.swift; sourceTree = "<group>"; };
 		AA0FE11111111111111111AA /* TuningPresetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuningPresetsView.swift; sourceTree = "<group>"; };
+		AABB111111111111111111AA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 				AA88888888888888888888AA /* Views */,
 				AA0F111111111111111111AA /* GuitarTunerApp.swift */,
 				AA0B111111111111111111AA /* Info.plist */,
+				AABB111111111111111111AA /* Assets.xcassets */,
 				AA99999999999999999999AA /* Frameworks */,
 				AAAAAAAAAAAAAAAAAAAAAA /* Products */,
 			);
@@ -193,6 +196,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AABB000000000000000000AA /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -5,6 +5,9 @@ struct MetronomeView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            logoHeader
+                .padding(.top, 16)
+
             Spacer()
 
             beatIndicator
@@ -30,10 +33,18 @@ struct MetronomeView: View {
 
     // MARK: - Subviews
 
+    private var logoHeader: some View {
+        Image("StringSenseLogo")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 72, height: 72)
+            .clipShape(Circle())
+    }
+
     private var beatIndicator: some View {
         HStack(spacing: 8) {
             ForEach(0..<vm.beatsPerMeasure, id: \.self) { i in
-                let isCurrent = vm.isPlaying && (vm.currentBeat % vm.beatsPerMeasure) == i
+                let isCurrent = vm.isPlaying && vm.activeBeat == i
                 let isAccent = i == 0
                 RoundedRectangle(cornerRadius: 6)
                     .fill(beatColor(isCurrent: isCurrent, isAccent: isAccent))
