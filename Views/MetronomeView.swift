@@ -34,10 +34,10 @@ struct MetronomeView: View {
     // MARK: - Subviews
 
     private var logoHeader: some View {
-        Image("StringSenseLogo")
+        Image("StaySharpLogo")
             .resizable()
             .scaledToFit()
-            .frame(width: 72, height: 72)
+            .frame(width: 90, height: 90)
             .clipShape(Circle())
     }
 

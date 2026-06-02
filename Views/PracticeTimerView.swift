@@ -11,10 +11,10 @@ struct PracticeTimerView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image("StringSenseLogo")
+            Image("StaySharpLogo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 72, height: 72)
+                .frame(width: 90, height: 90)
                 .clipShape(Circle())
                 .padding(.top, 16)
 

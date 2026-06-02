@@ -36,7 +36,7 @@ struct TunerView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("StringSense needs microphone access to detect pitch.")
+            Text("Stay Sharp needs microphone access to detect pitch.")
         }
     }
 
@@ -152,10 +152,10 @@ struct TunerView: View {
 
                 VStack {
                     Spacer()
-                    Image("StringSenseLogo")
+                    Image("StaySharpLogo")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 72, height: 72)
+                        .frame(width: 90, height: 90)
                         .clipShape(Circle())
                     Spacer()
                 }

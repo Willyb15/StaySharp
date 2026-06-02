@@ -76,9 +76,11 @@ class MetronomeViewModel: ObservableObject {
             audio.playBeat()
         }
 
-        withAnimation(.easeOut(duration: 0.08)) { beatFlash = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(.easeIn(duration: 0.15)) { self.beatFlash = false }
+        withAnimation(.easeOut(duration: 0.05)) { beatFlash = true }
+        // Hold for nearly the full beat, fade just before next beat fires
+        let holdDuration = max(interval - 0.08, 0.1)
+        DispatchQueue.main.asyncAfter(deadline: .now() + holdDuration) {
+            withAnimation(.easeIn(duration: 0.06)) { self.beatFlash = false }
         }
 
         currentBeat += 1

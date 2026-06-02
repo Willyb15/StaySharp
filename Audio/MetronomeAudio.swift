@@ -10,6 +10,10 @@ class MetronomeAudio {
     private lazy var beatBuffer: AVAudioPCMBuffer = makeClickBuffer(frequency: 900, duration: 0.05)
 
     init() {
+        let session = AVAudioSession.sharedInstance()
+        try? session.setCategory(.playback, mode: .default)
+        try? session.setActive(true)
+
         engine.attach(playerNode)
         let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1)!
         engine.connect(playerNode, to: engine.mainMixerNode, format: format)
