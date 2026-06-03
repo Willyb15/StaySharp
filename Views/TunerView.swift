@@ -134,8 +134,40 @@ struct TunerView: View {
             .buttonStyle(.plain)
 
             Spacer()
+
+            // Reference pitch A=440
+            referencePitchControl
         }
         .padding(.horizontal)
+    }
+
+    private var referencePitchControl: some View {
+        HStack(spacing: 4) {
+            Button {
+                vm.referencePitch = max(430, vm.referencePitch - 1)
+            } label: {
+                Image(systemName: "minus")
+                    .font(.system(size: 10, weight: .bold))
+                    .frame(width: 22, height: 22)
+                    .background(Color.white.opacity(0.08), in: Circle())
+            }
+            .buttonStyle(.plain)
+
+            Text("A=\(Int(vm.referencePitch))")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(vm.referencePitch == 440 ? .secondary : Color.yellow)
+                .frame(minWidth: 44)
+
+            Button {
+                vm.referencePitch = min(450, vm.referencePitch + 1)
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 10, weight: .bold))
+                    .frame(width: 22, height: 22)
+                    .background(Color.white.opacity(0.08), in: Circle())
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     private var noteDisplay: some View {

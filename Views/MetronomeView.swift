@@ -31,6 +31,8 @@ struct MetronomeView: View {
 
             subdivisionPicker
 
+            clickStylePicker
+
             Spacer()
 
             controlRow
@@ -205,6 +207,34 @@ struct MetronomeView: View {
 
     private var subdivisionOptions: [(value: Int, symbol: String, label: String)] {
         [(1, "♩", "Quarter"), (2, "♪♪", "8th"), (3, "♪³", "Triplet"), (4, "♬", "16th")]
+    }
+
+    private var clickStylePicker: some View {
+        VStack(spacing: 10) {
+            Text("Click Sound")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack(spacing: 8) {
+                ForEach(ClickStyle.allCases, id: \.self) { style in
+                    Button {
+                        vm.clickStyle = style
+                    } label: {
+                        Text(style.rawValue)
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(vm.clickStyle == style ? Color.green.opacity(0.25) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(vm.clickStyle == style ? Color.green.opacity(0.6) : Color.clear, lineWidth: 1)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 
     private var controlRow: some View {

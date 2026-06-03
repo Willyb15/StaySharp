@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ContentView: View {
     @StateObject private var tunerVM = TunerViewModel()
@@ -22,6 +23,12 @@ struct ContentView: View {
                     .tag(1)
             }
             .tint(.green)
+        }
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 }

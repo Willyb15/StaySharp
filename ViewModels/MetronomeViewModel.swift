@@ -37,6 +37,9 @@ class MetronomeViewModel: ObservableObject {
     @Published var beatFlash = false
     @Published var subdivision: Int = 1
     @Published var accentedBeats: Set<Int> = [0]
+    @Published var clickStyle: ClickStyle = .classic {
+        didSet { audio.style = clickStyle }
+    }
 
     @Published var timeSignature = TimeSignature(beats: 4, noteValue: 4) {
         didSet {

@@ -27,6 +27,9 @@ class TunerViewModel: ObservableObject {
     @Published var capo: Int = 0 {
         didSet { tunedStrings = [] }
     }
+    @Published var referencePitch: Double = 440 {
+        didSet { tunedStrings = [] }
+    }
     @Published var droneActive: Bool = false {
         didSet { droneActive ? startDrone() : drone.stop() }
     }
@@ -133,7 +136,7 @@ class TunerViewModel: ObservableObject {
             let ratio = smoothed / target
             note = (ratio > 0.8 && ratio < 1.25) ? noteRelativeTo(smoothed, target: target) : nil
         } else {
-            note = Note.from(frequency: smoothed)
+            note = Note.from(frequency: smoothed, referencePitch: referencePitch)
         }
 
         detectedNote = note
@@ -150,13 +153,13 @@ class TunerViewModel: ObservableObject {
     }
 
     private func adjustedFreq(_ string: GuitarString) -> Float {
-        guard capo > 0 else { return string.targetFrequency }
-        return string.targetFrequency * pow(2.0, Float(capo) / 12.0)
+        let base = Note.frequency(for: string.noteName, referencePitch: referencePitch)
+        guard capo > 0 else { return base }
+        return base * pow(2.0, Float(capo) / 12.0)
     }
 
-    // Returns a Note with name from the target and cents relative to it
     private func noteRelativeTo(_ smoothed: Float, target: Float) -> Note? {
-        guard let base = Note.from(frequency: target) else { return nil }
+        guard let base = Note.from(frequency: target, referencePitch: referencePitch) else { return nil }
         let cents = Float(1200.0 * log2(Double(smoothed) / Double(target)))
         return Note(name: base.name, octave: base.octave, cents: min(max(cents, -50), 50))
     }
