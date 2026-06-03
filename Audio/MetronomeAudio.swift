@@ -6,8 +6,9 @@ class MetronomeAudio {
     private let playerNode = AVAudioPlayerNode()
     private let sampleRate: Double = 44100
 
-    private lazy var accentBuffer: AVAudioPCMBuffer = makeClickBuffer(frequency: 1500, duration: 0.06)
-    private lazy var beatBuffer: AVAudioPCMBuffer = makeClickBuffer(frequency: 900, duration: 0.05)
+    private lazy var accentBuffer: AVAudioPCMBuffer = makeClickBuffer(frequency: 1500, duration: 0.06, volume: 0.6)
+    private lazy var beatBuffer: AVAudioPCMBuffer = makeClickBuffer(frequency: 900, duration: 0.05, volume: 0.6)
+    private lazy var subdivisionBuffer: AVAudioPCMBuffer = makeClickBuffer(frequency: 1200, duration: 0.025, volume: 0.2)
 
     init() {
         let session = AVAudioSession.sharedInstance()
@@ -22,6 +23,7 @@ class MetronomeAudio {
 
     func playAccent() { scheduleBuffer(accentBuffer) }
     func playBeat() { scheduleBuffer(beatBuffer) }
+    func playSubdivision() { scheduleBuffer(subdivisionBuffer) }
 
     private func scheduleBuffer(_ buffer: AVAudioPCMBuffer) {
         playerNode.stop()
@@ -29,7 +31,7 @@ class MetronomeAudio {
         playerNode.play()
     }
 
-    private func makeClickBuffer(frequency: Double, duration: Double) -> AVAudioPCMBuffer {
+    private func makeClickBuffer(frequency: Double, duration: Double, volume: Double = 0.6) -> AVAudioPCMBuffer {
         let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1)!
         let frameCount = AVAudioFrameCount(sampleRate * duration)
         let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount)!
@@ -46,7 +48,7 @@ class MetronomeAudio {
                 envelope = Double(totalFrames - i) / Double(releaseFrames)
             }
             let sample = sin(2.0 * .pi * frequency * Double(i) / sampleRate)
-            data[i] = Float(sample * envelope * 0.6)
+            data[i] = Float(sample * envelope * volume)
         }
         return buffer
     }

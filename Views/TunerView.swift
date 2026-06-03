@@ -9,6 +9,9 @@ struct TunerView: View {
             tuningSelector
                 .padding(.top, 12)
 
+            modeRow
+                .padding(.top, 8)
+
             Spacer()
 
             noteDisplay
@@ -22,7 +25,12 @@ struct TunerView: View {
 
             stringSelector
 
-            listenButton
+            if [Instrument.guitar, .sevenString].contains(vm.selectedTuning.instrument) {
+                capoSelector
+                    .padding(.top, 12)
+            }
+
+            bottomControls
                 .padding(.bottom, 32)
         }
         .sheet(isPresented: $showTunings) {
@@ -67,7 +75,7 @@ struct TunerView: View {
 
             Button {
                 vm.autoMode.toggle()
-                if vm.autoMode { vm.selectedString = nil }
+                if vm.autoMode { vm.selectedString = nil; vm.stopGuidedTuning() }
             } label: {
                 Text("Auto")
                     .font(.caption.weight(.semibold))
@@ -78,6 +86,54 @@ struct TunerView: View {
                     .foregroundStyle(vm.autoMode ? .green : .secondary)
             }
             .buttonStyle(.plain)
+        }
+        .padding(.horizontal)
+    }
+
+    private var modeRow: some View {
+        HStack(spacing: 8) {
+            // Guided string-by-string button
+            Button {
+                if vm.guidedTuning {
+                    vm.stopGuidedTuning()
+                } else {
+                    vm.autoMode = false
+                    vm.startGuidedTuning()
+                }
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: vm.guidedTuning ? "stop.circle" : "arrow.right.circle")
+                        .font(.caption)
+                    Text(vm.guidedTuning ? vm.guidedProgress : "Guide")
+                        .font(.caption.weight(.semibold))
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background(vm.guidedTuning ? Color.orange.opacity(0.2) : Color.white.opacity(0.08), in: Capsule())
+                .overlay(Capsule().stroke(vm.guidedTuning ? Color.orange.opacity(0.5) : Color.clear, lineWidth: 1))
+                .foregroundStyle(vm.guidedTuning ? .orange : .secondary)
+            }
+            .buttonStyle(.plain)
+
+            // Drone tone button
+            Button {
+                vm.droneActive.toggle()
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: vm.droneActive ? "waveform.circle.fill" : "waveform.circle")
+                        .font(.caption)
+                    Text("Drone")
+                        .font(.caption.weight(.semibold))
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background(vm.droneActive ? Color.purple.opacity(0.2) : Color.white.opacity(0.08), in: Capsule())
+                .overlay(Capsule().stroke(vm.droneActive ? Color.purple.opacity(0.5) : Color.clear, lineWidth: 1))
+                .foregroundStyle(vm.droneActive ? .purple : .secondary)
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
         }
         .padding(.horizontal)
     }
@@ -95,8 +151,7 @@ struct TunerView: View {
                         .contentTransition(.numericText())
 
                     if let freq = vm.detectedFrequency {
-                        Text("·")
-                            .foregroundStyle(.tertiary)
+                        Text("·").foregroundStyle(.tertiary)
                         Text(String(format: "%.1f Hz", freq))
                             .contentTransition(.numericText())
                     }
@@ -127,24 +182,24 @@ struct TunerView: View {
     }
 
     private var stringSelector: some View {
-        VStack(spacing: 10) {
+        let allSorted = vm.selectedTuning.strings.sorted { $0.stringNumber > $1.stringNumber }
+        let leftCount = (allSorted.count + 1) / 2
+        let leftStrings = Array(allSorted.prefix(leftCount).reversed())
+        let rightStrings = Array(allSorted.suffix(allSorted.count - leftCount))
+        let logoHeight = CGFloat(max(leftStrings.count, rightStrings.count)) * 52
+
+        return VStack(spacing: 10) {
             HStack(alignment: .top) {
-                // Bass strings: 4(D), 5(A), 6(E) — mirrors left pegs on headstock
                 VStack(spacing: 8) {
-                    ForEach([4, 5, 6], id: \.self) { num in
-                        if let str = vm.selectedTuning.strings.first(where: { $0.stringNumber == num }) {
-                            StringButton(
-                                guitarString: str,
-                                isSelected: vm.selectedString == str,
-                                isInTune: vm.tunedStrings.contains(str.id)
-                            ) {
-                                if vm.autoMode {
-                                    vm.autoMode = false
-                                    vm.selectedString = str
-                                } else {
-                                    vm.selectedString = vm.selectedString == str ? nil : str
-                                }
-                            }
+                    ForEach(leftStrings) { str in
+                        StringButton(
+                            guitarString: str,
+                            isSelected: vm.selectedString == str,
+                            isInTune: vm.tunedStrings.contains(str.id)
+                        ) {
+                            vm.autoMode = false
+                            vm.stopGuidedTuning()
+                            vm.selectedString = vm.selectedString == str ? nil : str
                         }
                     }
                 }
@@ -155,28 +210,22 @@ struct TunerView: View {
                     Image("StaySharpLogo")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 90, height: 90)
+                        .frame(width: 80, height: 80)
                         .clipShape(Circle())
                     Spacer()
                 }
-                .frame(width: 80, height: 148)
+                .frame(width: 80, height: logoHeight)
 
-                // Treble strings: 3(G), 2(B), 1(e) — mirrors right pegs on headstock
                 VStack(spacing: 8) {
-                    ForEach([3, 2, 1], id: \.self) { num in
-                        if let str = vm.selectedTuning.strings.first(where: { $0.stringNumber == num }) {
-                            StringButton(
-                                guitarString: str,
-                                isSelected: vm.selectedString == str,
-                                isInTune: vm.tunedStrings.contains(str.id)
-                            ) {
-                                if vm.autoMode {
-                                    vm.autoMode = false
-                                    vm.selectedString = str
-                                } else {
-                                    vm.selectedString = vm.selectedString == str ? nil : str
-                                }
-                            }
+                    ForEach(rightStrings) { str in
+                        StringButton(
+                            guitarString: str,
+                            isSelected: vm.selectedString == str,
+                            isInTune: vm.tunedStrings.contains(str.id)
+                        ) {
+                            vm.autoMode = false
+                            vm.stopGuidedTuning()
+                            vm.selectedString = vm.selectedString == str ? nil : str
                         }
                     }
                 }
@@ -189,10 +238,50 @@ struct TunerView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        .padding(.bottom, 20)
+        .padding(.bottom, 4)
     }
 
-    private var listenButton: some View {
+    private var capoSelector: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text("Capo")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                if vm.capo > 0 {
+                    Button { vm.capo = 0 } label: {
+                        Text("Remove")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 16)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(0...7, id: \.self) { fret in
+                        Button { vm.capo = fret } label: {
+                            VStack(spacing: 2) {
+                                Text(fret == 0 ? "Open" : "Fret \(fret)")
+                                    .font(.caption2.weight(vm.capo == fret ? .semibold : .regular))
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                            .background(vm.capo == fret ? Color.green.opacity(0.2) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 8))
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(vm.capo == fret ? Color.green.opacity(0.5) : Color.clear, lineWidth: 1))
+                            .foregroundStyle(vm.capo == fret ? .green : .secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+        }
+    }
+
+    private var bottomControls: some View {
         Button {
             vm.toggleListening()
         } label: {
@@ -244,9 +333,7 @@ struct StringButton: View {
                 Circle()
                     .fill(backgroundColor)
                     .frame(width: 44, height: 44)
-                    .overlay(
-                        Circle().stroke(borderColor, lineWidth: isSelected || isInTune ? 2 : 0)
-                    )
+                    .overlay(Circle().stroke(borderColor, lineWidth: isSelected || isInTune ? 2 : 0))
                 Text(noteLetter(guitarString.noteName))
                     .font(.system(size: 16, weight: isSelected || isInTune ? .semibold : .regular, design: .rounded))
                     .foregroundStyle(labelColor)
@@ -277,4 +364,3 @@ struct StringButton: View {
         String(name.prefix(while: { !$0.isNumber }))
     }
 }
-

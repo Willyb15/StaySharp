@@ -7,34 +7,43 @@ struct TuningPresetsView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(TuningPreset.all) { preset in
-                    Button {
-                        vm.selectedTuning = preset
-                        vm.selectedString = nil
-                        dismiss()
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(preset.name)
-                                    .font(.headline)
-                                    .foregroundStyle(.primary)
-                                Text(preset.description)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                ForEach(Instrument.allCases, id: \.self) { instrument in
+                    let presets = TuningPreset.forInstrument(instrument)
+                    if !presets.isEmpty {
+                        Section {
+                            ForEach(presets) { preset in
+                                Button {
+                                    vm.selectedTuning = preset
+                                    vm.selectedString = nil
+                                    dismiss()
+                                } label: {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 3) {
+                                            Text(preset.name)
+                                                .font(.headline)
+                                                .foregroundStyle(.primary)
+                                            Text(preset.description)
+                                                .font(.subheadline)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        Spacer()
+                                        if vm.selectedTuning == preset {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundStyle(.green)
+                                                .font(.title3)
+                                        }
+                                    }
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                                .listRowBackground(Color.white.opacity(0.05))
                             }
-
-                            Spacer()
-
-                            if vm.selectedTuning == preset {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(.green)
-                                    .font(.title3)
-                            }
+                        } header: {
+                            Text(instrument.rawValue)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
                         }
-                        .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
-                    .listRowBackground(Color.white.opacity(0.05))
                 }
             }
             .scrollContentBackground(.hidden)

@@ -12,6 +12,13 @@ struct MetronomeView: View {
 
             beatIndicator
 
+            if !vm.isPlaying {
+                Text("Tap a beat to set accents")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, 4)
+            }
+
             Spacer()
 
             bpmDisplay
@@ -21,6 +28,8 @@ struct MetronomeView: View {
             Spacer()
 
             beatsPicker
+
+            subdivisionPicker
 
             Spacer()
 
@@ -45,13 +54,24 @@ struct MetronomeView: View {
         HStack(spacing: 8) {
             ForEach(0..<vm.beatsPerMeasure, id: \.self) { i in
                 let isCurrent = vm.isPlaying && vm.activeBeat == i
-                let isAccent = i == 0
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(beatColor(isCurrent: isCurrent, isAccent: isAccent))
-                    .frame(height: isAccent ? 44 : 36)
-                    .frame(maxWidth: .infinity)
-                    .scaleEffect(isCurrent && vm.beatFlash ? 1.15 : 1.0)
-                    .animation(.easeOut(duration: 0.06), value: vm.beatFlash)
+                let isAccent = vm.accentedBeats.contains(i)
+                Button {
+                    vm.toggleAccent(beat: i)
+                } label: {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(beatColor(isCurrent: isCurrent, isAccent: isAccent))
+                        .frame(height: isAccent ? 44 : 36)
+                        .frame(maxWidth: .infinity)
+                        .scaleEffect(isCurrent && vm.beatFlash ? 1.15 : 1.0)
+                        .animation(.easeOut(duration: 0.06), value: vm.beatFlash)
+                        .overlay(
+                            isAccent && !isCurrent ?
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(Color.white.opacity(0.25), lineWidth: 1)
+                            : nil
+                        )
+                }
+                .buttonStyle(.plain)
             }
         }
         .frame(height: 50)
@@ -73,17 +93,11 @@ struct MetronomeView: View {
 
     private var bpmSlider: some View {
         VStack(spacing: 8) {
-            Slider(value: $vm.bpm, in: 20...300, step: 1) {
-                Text("BPM")
-            }
-            .tint(.green)
-            .onChange(of: vm.bpm) { _, _ in
-                if vm.isPlaying {
-                    // Restart metronome with new tempo
-                    vm.togglePlay()
-                    vm.togglePlay()
+            Slider(value: $vm.bpm, in: 20...300, step: 1) { Text("BPM") }
+                .tint(.green)
+                .onChange(of: vm.bpm) { _, _ in
+                    if vm.isPlaying { vm.restart() }
                 }
-            }
 
             HStack {
                 Text("20")
@@ -107,26 +121,67 @@ struct MetronomeView: View {
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(TimeSignature.presets, id: \.label) { ts in
+                        Button {
+                            vm.timeSignature = ts
+                            vm.currentBeat = 0
+                        } label: {
+                            Text(ts.label)
+                                .font(.subheadline.weight(.semibold))
+                                .frame(minWidth: 48)
+                                .padding(.vertical, 10)
+                                .padding(.horizontal, 8)
+                                .background(vm.timeSignature == ts ? Color.green.opacity(0.25) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(vm.timeSignature == ts ? Color.green.opacity(0.6) : Color.clear, lineWidth: 1)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
+    private var subdivisionPicker: some View {
+        VStack(spacing: 10) {
+            Text("Subdivision")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
             HStack(spacing: 8) {
-                ForEach([2, 3, 4, 6], id: \.self) { beats in
+                ForEach(subdivisionOptions, id: \.value) { option in
                     Button {
-                        vm.beatsPerMeasure = beats
-                        vm.currentBeat = 0
+                        vm.subdivision = option.value
+                        if vm.isPlaying { vm.restart() }
                     } label: {
-                        Text("\(beats)/4")
-                            .font(.subheadline.weight(.semibold))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(vm.beatsPerMeasure == beats ? Color.green.opacity(0.25) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(vm.beatsPerMeasure == beats ? Color.green.opacity(0.6) : Color.clear, lineWidth: 1)
-                            )
+                        VStack(spacing: 2) {
+                            Text(option.symbol)
+                                .font(.subheadline.weight(.semibold))
+                            Text(option.label)
+                                .font(.system(size: 9))
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(vm.subdivision == option.value ? Color.green.opacity(0.25) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(vm.subdivision == option.value ? Color.green.opacity(0.6) : Color.clear, lineWidth: 1)
+                        )
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
+    }
+
+    private var subdivisionOptions: [(value: Int, symbol: String, label: String)] {
+        [(1, "♩", "Quarter"), (2, "♪♪", "8th"), (3, "♪³", "Triplet"), (4, "♬", "16th")]
     }
 
     private var controlRow: some View {
@@ -135,10 +190,8 @@ struct MetronomeView: View {
                 vm.tapTempo()
             } label: {
                 VStack(spacing: 4) {
-                    Image(systemName: "hand.tap.fill")
-                        .font(.title2)
-                    Text("Tap Tempo")
-                        .font(.caption2)
+                    Image(systemName: "hand.tap.fill").font(.title2)
+                    Text("Tap Tempo").font(.caption2)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -150,10 +203,8 @@ struct MetronomeView: View {
                 vm.togglePlay()
             } label: {
                 HStack(spacing: 8) {
-                    Image(systemName: vm.isPlaying ? "stop.fill" : "play.fill")
-                        .font(.title2)
-                    Text(vm.isPlaying ? "Stop" : "Play")
-                        .font(.headline)
+                    Image(systemName: vm.isPlaying ? "stop.fill" : "play.fill").font(.title2)
+                    Text(vm.isPlaying ? "Stop" : "Play").font(.headline)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -173,7 +224,7 @@ struct MetronomeView: View {
         if isCurrent && vm.beatFlash {
             return isAccent ? .green : .white.opacity(0.7)
         }
-        return isAccent ? Color.white.opacity(0.2) : Color.white.opacity(0.1)
+        return isAccent ? Color.white.opacity(0.22) : Color.white.opacity(0.08)
     }
 
     private func tempoMarking(_ bpm: Double) -> String {

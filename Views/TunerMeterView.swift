@@ -1,19 +1,19 @@
 import SwiftUI
 
 struct TunerMeterView: View {
-    let cents: Float          // -50 to +50
+    let cents: Float
     let state: Note.TuningState
+
+    @State private var animatedCents: Float = 0
 
     private let arcRadius: CGFloat = 130
     private let needleLength: CGFloat = 120
 
-    // Maps cents [-50, 50] to arc angle in radians
-    // -50 → π (left), 0 → 3π/2 (top), +50 → 2π (right)
     private func centsToAngle(_ cents: Double) -> Double {
         Double.pi * (1.0 + (cents + 50.0) / 100.0)
     }
 
-    private var needleAngle: Double { centsToAngle(Double(cents)) }
+    private var needleAngle: Double { centsToAngle(Double(animatedCents)) }
 
     private var needleColor: Color {
         switch state {
@@ -26,7 +26,6 @@ struct TunerMeterView: View {
     var body: some View {
         GeometryReader { geo in
             let center = CGPoint(x: geo.size.width / 2, y: geo.size.height - 8)
-
             Canvas { ctx, _ in
                 drawArcTrack(ctx: ctx, center: center)
                 drawTickMarks(ctx: ctx, center: center)
@@ -36,6 +35,12 @@ struct TunerMeterView: View {
             }
         }
         .frame(height: arcRadius + 44)
+        .onChange(of: cents) { _, newVal in
+            withAnimation(.spring(response: 0.18, dampingFraction: 0.65)) {
+                animatedCents = newVal
+            }
+        }
+        .onAppear { animatedCents = cents }
     }
 
     private func drawArcTrack(ctx: GraphicsContext, center: CGPoint) {
@@ -51,13 +56,11 @@ struct TunerMeterView: View {
         }
         ctx.stroke(path, with: .color(.white.opacity(0.15)), style: StrokeStyle(lineWidth: 3, lineCap: .round))
 
-        // In-tune zone: ±5 cents highlighted in green
         var inTunePath = Path()
         let inTuneStart = centsToAngle(-5)
         let inTuneEnd = centsToAngle(5)
-        let zoneSteps = 20
-        for i in 0...zoneSteps {
-            let t = Double(i) / Double(zoneSteps)
+        for i in 0...20 {
+            let t = Double(i) / 20.0
             let angle = inTuneStart + t * (inTuneEnd - inTuneStart)
             let x = center.x + arcRadius * cos(angle)
             let y = center.y + arcRadius * sin(angle)
@@ -77,11 +80,9 @@ struct TunerMeterView: View {
             let angle = centsToAngle(tick.cents)
             let inner = arcRadius - tick.length
             let outer = arcRadius + 2
-            let p1 = CGPoint(x: center.x + inner * cos(angle), y: center.y + inner * sin(angle))
-            let p2 = CGPoint(x: center.x + outer * cos(angle), y: center.y + outer * sin(angle))
             var path = Path()
-            path.move(to: p1)
-            path.addLine(to: p2)
+            path.move(to: CGPoint(x: center.x + inner * cos(angle), y: center.y + inner * sin(angle)))
+            path.addLine(to: CGPoint(x: center.x + outer * cos(angle), y: center.y + outer * sin(angle)))
             let color: Color = tick.cents == 0 ? .white.opacity(0.8) : .white.opacity(0.4)
             ctx.stroke(path, with: .color(color), style: StrokeStyle(lineWidth: tick.length >= 12 ? 2 : 1.5, lineCap: .round))
         }
@@ -90,13 +91,13 @@ struct TunerMeterView: View {
     private func drawCentLabels(ctx: GraphicsContext, center: CGPoint) {
         let items: [(Double, String)] = [(-20, "−20"), (-10, "−10"), (0, "0"), (10, "+10"), (20, "+20")]
         let r = arcRadius + 16
-        for (cents, label) in items {
-            let angle = centsToAngle(cents)
+        for (c, label) in items {
+            let angle = centsToAngle(c)
             let pt = CGPoint(x: center.x + r * cos(angle), y: center.y + r * sin(angle))
             let t = ctx.resolve(
                 Text(label)
                     .font(.system(size: 9, weight: .regular, design: .monospaced))
-                    .foregroundColor(cents == 0 ? .white.opacity(0.55) : .white.opacity(0.3))
+                    .foregroundColor(c == 0 ? .white.opacity(0.55) : .white.opacity(0.3))
             )
             ctx.draw(t, at: pt)
         }
@@ -105,14 +106,10 @@ struct TunerMeterView: View {
     private func drawNeedle(ctx: GraphicsContext, center: CGPoint) {
         let tipX = center.x + needleLength * cos(needleAngle)
         let tipY = center.y + needleLength * sin(needleAngle)
-
         var path = Path()
         path.move(to: center)
         path.addLine(to: CGPoint(x: tipX, y: tipY))
-
         ctx.stroke(path, with: .color(needleColor), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-
-        // Glowing tip
         ctx.fill(
             Path(ellipseIn: CGRect(x: tipX - 4, y: tipY - 4, width: 8, height: 8)),
             with: .color(needleColor)
@@ -130,7 +127,6 @@ struct TunerMeterView: View {
 #Preview {
     ZStack {
         Color.black
-        TunerMeterView(cents: -20, state: .flat)
-            .padding()
+        TunerMeterView(cents: -20, state: .flat).padding()
     }
 }

@@ -13,9 +13,11 @@
 		AA0E111111111111111111AA /* GuitarTunerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F111111111111111111AA /* GuitarTunerApp.swift */; };
 		AA0E211111111111111111AA /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F211111111111111111AA /* AudioEngine.swift */; };
 		AA0E311111111111111111AA /* MetronomeAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F311111111111111111AA /* MetronomeAudio.swift */; };
+		AA0E3B1111111111111111AA /* DroneAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F3B1111111111111111AA /* DroneAudio.swift */; };
 		AA0E411111111111111111AA /* PitchDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F411111111111111111AA /* PitchDetector.swift */; };
 		AA0E511111111111111111AA /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F511111111111111111AA /* Note.swift */; };
 		AA0E611111111111111111AA /* TuningPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F611111111111111111AA /* TuningPreset.swift */; };
+		AA0E6A1111111111111111AA /* PracticeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F6A1111111111111111AA /* PracticeLog.swift */; };
 		AA0E711111111111111111AA /* MetronomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F711111111111111111AA /* MetronomeViewModel.swift */; };
 		AA0E811111111111111111AA /* TunerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F811111111111111111AA /* TunerViewModel.swift */; };
 		AA0E911111111111111111AA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0F911111111111111111AA /* ContentView.swift */; };
@@ -36,9 +38,11 @@
 		AA0F111111111111111111AA /* GuitarTunerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuitarTunerApp.swift; sourceTree = "<group>"; };
 		AA0F211111111111111111AA /* AudioEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngine.swift; sourceTree = "<group>"; };
 		AA0F311111111111111111AA /* MetronomeAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetronomeAudio.swift; sourceTree = "<group>"; };
+		AA0F3B1111111111111111AA /* DroneAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DroneAudio.swift; sourceTree = "<group>"; };
 		AA0F411111111111111111AA /* PitchDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PitchDetector.swift; sourceTree = "<group>"; };
 		AA0F511111111111111111AA /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		AA0F611111111111111111AA /* TuningPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuningPreset.swift; sourceTree = "<group>"; };
+		AA0F6A1111111111111111AA /* PracticeLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeLog.swift; sourceTree = "<group>"; };
 		AA0F711111111111111111AA /* MetronomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetronomeViewModel.swift; sourceTree = "<group>"; };
 		AA0F811111111111111111AA /* TunerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunerViewModel.swift; sourceTree = "<group>"; };
 		AA0F911111111111111111AA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -84,6 +88,7 @@
 			children = (
 				AA0F211111111111111111AA /* AudioEngine.swift */,
 				AA0F311111111111111111AA /* MetronomeAudio.swift */,
+				AA0F3B1111111111111111AA /* DroneAudio.swift */,
 				AA0F411111111111111111AA /* PitchDetector.swift */,
 			);
 			path = Audio;
@@ -94,6 +99,7 @@
 			children = (
 				AA0F511111111111111111AA /* Note.swift */,
 				AA0F611111111111111111AA /* TuningPreset.swift */,
+				AA0F6A1111111111111111AA /* PracticeLog.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -210,9 +216,11 @@
 				AA0E111111111111111111AA /* GuitarTunerApp.swift in Sources */,
 				AA0E211111111111111111AA /* AudioEngine.swift in Sources */,
 				AA0E311111111111111111AA /* MetronomeAudio.swift in Sources */,
+				AA0E3B1111111111111111AA /* DroneAudio.swift in Sources */,
 				AA0E411111111111111111AA /* PitchDetector.swift in Sources */,
 				AA0E511111111111111111AA /* Note.swift in Sources */,
 				AA0E611111111111111111AA /* TuningPreset.swift in Sources */,
+				AA0E6A1111111111111111AA /* PracticeLog.swift in Sources */,
 				AA0E711111111111111111AA /* MetronomeViewModel.swift in Sources */,
 				AA0E811111111111111111AA /* TunerViewModel.swift in Sources */,
 				AA0E911111111111111111AA /* ContentView.swift in Sources */,
